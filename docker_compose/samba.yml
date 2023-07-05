@@ -1,0 +1,14 @@
+services:
+    samba:
+#        ports:
+#            - '139:139'
+#            - '445:445'
+        volumes:
+            - '/opt/docker_volume/samba:/Share'
+        environment:
+            - TZ=Asia/Shanghai
+        image: dperson/samba
+        restart: unless-stopped
+        container_name: samba
+        network_mode: host
+        command: '-g "client min protocol = NT1" -s "iShare;/Share;yes;no;yes" -p -n'

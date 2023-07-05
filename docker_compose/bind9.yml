@@ -1,0 +1,15 @@
+services:
+    bind9:
+        ports:
+            - '53:53/udp'
+            - '53:53/tcp'
+        volumes:
+            - '/opt/docker_volume/bind9/etc:/etc/bind'
+            - '/opt/docker_volume/bind9/lib:/var/lib/bind'
+        environment:
+            - TZ=Asia/Shanghai
+        image: internetsystemsconsortium/bind9:9.18
+#        image: ubuntu/bind9
+        restart: unless-stopped
+        container_name: bind9
+        command: /usr/sbin/named -g -c /etc/bind/named.conf -u bind

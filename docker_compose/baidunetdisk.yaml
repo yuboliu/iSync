@@ -1,0 +1,11 @@
+services:
+    baidunetdisk:
+        ports:
+            - '5800:5800'
+            - '5801:5900'
+        volumes:
+            - '/opt/docker_volume/samba/baidunetdisk:/config/baidunetdiskdownload'
+            - '/opt/docker_volume/baidunetdisk/config:/config'
+        image: johngong/baidunetdisk:latest
+        restart: unless-stopped
+        container_name: baidunetdisk

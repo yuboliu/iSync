@@ -1,0 +1,10 @@
+services:
+  gerbera:
+    image: gerbera/gerbera
+    restart: unless-stopped
+    container_name: gerbera
+    network_mode: host
+    volumes:
+      - /opt/docker_volume/gerbera:/var/run/gerbera
+      - /opt/docker_volume/samba:/content:ro
+
