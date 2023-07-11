@@ -1,0 +1,80 @@
+services:
+  gost:
+    image: ginuerzh/gost
+    container_name: gost
+    restart: unless-stopped
+    networks:
+      macvlan:
+        ipv4_address: 192.168.1.90
+    command:
+      -L=:1080?udp=true -F=192.168.1.254:7890
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=8080
+    volumes:
+      - 'ShareVolume:/downloads'
+      - '/opt/docker_volume/qbittorrent/config:/config'
+    networks:
+      macvlan:
+        ipv4_address: 192.168.1.89
+#    depends_on:
+#      - gost
+#    links:
+#      - gost
+  samba:
+#     ports:
+#       - '139:139'
+#       - '445:445'
+      volumes:
+        - 'ShareVolume:/Share'
+      environment:
+        - USERID=1000
+        - GROUPID=1000
+        - TZ=Asia/Shanghai
+      image: dperson/samba
+      restart: unless-stopped
+      container_name: samba
+      network_mode: host
+      command: '-g "client min protocol = NT1" -s "iShare;/Share;yes;no;yes" -p -n'
+  baidunetdisk:
+    ports:
+      - '5800:5800'
+      - '5801:5900'
+    volumes:
+      - 'ShareVolume:/config/baidunetdiskdownload'
+      - '/opt/docker_volume/baidunetdisk/config:/config'
+    image: johngong/baidunetdisk:latest
+    restart: unless-stopped
+    container_name: baidunetdisk
+  gerbera:
+    image: gerbera/gerbera
+    restart: unless-stopped
+    container_name: gerbera
+    network_mode: host
+    volumes:
+      - 'ShareVolume:/content:ro'
+      - '/opt/docker_volume/gerbera:/var/run/gerbera'
+volumes:
+  ShareVolume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/docker_volume/samba
+networks:
+  macvlan:
+    name: iMacvlan
+    driver: macvlan
+    driver_opts:
+      parent: ens33
+      macvlan_mode: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.254

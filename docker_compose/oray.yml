@@ -1,8 +1,0 @@
-services:
-    oray:
-        image: txyu78356/oray:5.2
-        privileged: true
-        mac_address: 00:0c:29:59:95:99
-        restart: unless-stopped
-        container_name: oray
-#        command: '/sbin/init'

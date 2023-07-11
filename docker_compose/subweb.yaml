@@ -1,7 +1,0 @@
-services:
-    subweb:
-        ports:
-            - '25501:80'
-        image: careywong/subweb:latest
-        restart: unless-stopped
-        container_name: subweb
