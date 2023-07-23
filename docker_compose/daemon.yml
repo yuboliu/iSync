@@ -1,0 +1,32 @@
+services:
+  subconverter:
+    ports:
+      - '25500:25500'
+      - '25501:80'
+    image: tindy2013/subconverter:latest
+    restart: unless-stopped
+    container_name: subconverter
+  subweb:
+    image: careywong/subweb:latest
+    restart: unless-stopped
+    container_name: subweb
+    network_mode: service:subconverter
+    depends_on:
+      - subconverter
+  portainer:
+    ports:
+      - '8000:8000'
+      - '9443:9443'
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    container_name: portainer
+    volumes:
+      - 'v_portainer:/data:'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+volumes:
+  v_portainer:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/docker_volume/portainer
