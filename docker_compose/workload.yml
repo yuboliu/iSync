@@ -13,8 +13,8 @@ services:
     container_name: qbittorrent
     restart: unless-stopped
     environment:
-#      - PUID=1000
-#      - PGID=1000
+      - PUID=65534
+      - PGID=65534
       - TZ=Asia/Shanghai
       - WEBUI_PORT=443
     volumes:
@@ -28,6 +28,9 @@ services:
 #    links:
 #      - gost
   baidunetdisk:
+    environment:
+      - USER_ID=65534
+      - GROUP_ID=65534
     ports:
       - '5800:5800'
       - '5801:5900'
@@ -57,8 +60,9 @@ services:
     restart: unless-stopped
     container_name: gerbera
     network_mode: host
+    user: 65534:65534
     volumes:
-      - '/mnt/NFS_Share/iDownload:/content:ro'
+      - '/mnt/NFS_Share/iMedia:/content:ro'
       - '/mnt/NFS_Share/DockerPV/gerbera:/var/run/gerbera'
 networks:
   macvlan:
