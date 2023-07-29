@@ -13,13 +13,13 @@ services:
     container_name: qbittorrent
     restart: unless-stopped
     environment:
-      - PUID=1000
-      - PGID=1000
+#      - PUID=1000
+#      - PGID=1000
       - TZ=Asia/Shanghai
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=443
     volumes:
-      - 'ShareVolume:/downloads'
-      - '/opt/docker_volume/qbittorrent/config:/config'
+      - '/mnt/NFS_Share/iDownload:/downloads'
+      - '/mnt/NFS_Share/DockerPV/qbittorrent/config:/config'
     networks:
       macvlan:
         ipv4_address: 192.168.1.89
@@ -27,54 +27,54 @@ services:
 #      - gost
 #    links:
 #      - gost
-  samba:
-#     ports:
-#       - '139:139'
-#       - '445:445'
-      volumes:
-        - 'ShareVolume:/Share'
-      environment:
-        - USERID=1000
-        - GROUPID=1000
-        - TZ=Asia/Shanghai
-      image: dperson/samba
-      restart: unless-stopped
-      container_name: samba
-      network_mode: host
-      command: '-g "client min protocol = NT1" -s "iShare;/Share;yes;no;yes" -p -n'
   baidunetdisk:
     ports:
       - '5800:5800'
       - '5801:5900'
     volumes:
-      - 'ShareVolume:/config/baidunetdiskdownload'
-      - '/opt/docker_volume/baidunetdisk/config:/config'
+      - '/mnt/NFS_Share/DockerPV/baidunetdisk:/config'
+      - '/mnt/NFS_Share/iDownload:/download'
     image: johngong/baidunetdisk:latest
     restart: unless-stopped
     container_name: baidunetdisk
+#  samba:
+#     ports:
+#       - '139:139'
+#       - '445:445'
+#      volumes:
+#        - '/mnt/NFS_Share/iDownload:/Share'
+#      environment:
+#        - USERID=1000
+#        - GROUPID=1000
+#        - TZ=Asia/Shanghai
+#      image: dperson/samba
+#      restart: unless-stopped
+#      container_name: samba
+#      network_mode: host
+#      command: '-g "client min protocol = NT1" -s "iShare;/Share;yes;no;yes" -p -n'
   gerbera:
     image: gerbera/gerbera
     restart: unless-stopped
     container_name: gerbera
     network_mode: host
     volumes:
-      - 'ShareVolume:/content:ro'
-      - '/opt/docker_volume/gerbera:/var/run/gerbera'
-volumes:
-  ShareVolume:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /opt/docker_volume/samba
+      - '/mnt/NFS_Share/iDownload:/content:ro'
+      - '/mnt/NFS_Share/DockerPV/gerbera:/var/run/gerbera'
 networks:
   macvlan:
     name: iMacvlan
     driver: macvlan
     driver_opts:
-      parent: ens33
+      parent: ens18
       macvlan_mode: bridge
     ipam:
       config:
         - subnet: 192.168.1.0/24
           gateway: 192.168.1.254
+#volumes:
+#  ShareVolume:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: /opt/docker_volume/samba

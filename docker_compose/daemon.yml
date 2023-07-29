@@ -21,12 +21,5 @@ services:
     restart: unless-stopped
     container_name: portainer
     volumes:
-      - 'v_portainer:/data:'
+      - '/mnt/NFS_Share/DockerPV/portainer/:/data:'
       - '/var/run/docker.sock:/var/run/docker.sock'
-volumes:
-  v_portainer:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /opt/docker_volume/portainer
