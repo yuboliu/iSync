@@ -1,0 +1,130 @@
+services:
+  gost:
+    image: ginuerzh/gost
+    container_name: gost
+    restart: unless-stopped
+    networks:
+      macvlan:
+        ipv4_address: 192.168.1.90
+    command:
+      -L=:1080?udp=true -F=192.168.1.254:7890
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=443
+    volumes:
+      - 'iDownload_Qbittorrent:/downloads'
+      - 'qbittorrent:/config'
+    networks:
+      macvlan:
+        ipv4_address: 192.168.1.89
+#    depends_on:
+#      - gost
+#    links:
+#      - gost
+  baidunetdisk:
+    environment:
+      - USER_ID=65534
+      - GROUP_ID=65534
+    ports:
+      - '5800:5800'
+      - '5801:5900'
+    volumes:
+      - 'iDownload_BaiduNetdisk:/download'
+      - 'baidunetdisk:/config'
+    image: johngong/baidunetdisk:latest
+    restart: unless-stopped
+    container_name: baidunetdisk
+  gerbera:
+    image: gerbera/gerbera
+    restart: unless-stopped
+    container_name: gerbera
+    network_mode: host
+    user: 65534:65534
+    volumes:
+      - 'iMedia:/content:ro'
+      - 'gerbera:/var/run/gerbera'
+  subconverter:
+    ports:
+      - '25500:25500'
+      - '25501:80'
+    image: tindy2013/subconverter:latest
+    restart: unless-stopped
+    container_name: subconverter
+  subweb:
+    image: careywong/subweb:latest
+    restart: unless-stopped
+    container_name: subweb
+    network_mode: service:subconverter
+    depends_on:
+      - subconverter
+  portainer:
+    ports:
+      - '8000:8000'
+      - '9443:9443'
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    container_name: portainer
+    volumes:
+      - 'portainer:/data:'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    user: 65534:999
+networks:
+  macvlan:
+    name: iMacvlan
+    driver: macvlan
+    driver_opts:
+      parent: ens18
+      macvlan_mode: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.254
+volumes:
+  qbittorrent:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/DockerPV/qbittorrent/config
+  baidunetdisk:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/DockerPV/baidunetdisk
+  gerbera:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/DockerPV/gerbera
+  iDownload_Qbittorrent:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/iDownload/qbittorrent
+  iDownload_BaiduNetdisk:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/iDownload/baidunetdisk
+  iMedia:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/iMedia
+  portainer:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/DockerPV/portainer
