@@ -1,7 +1,3 @@
-provider "alicloud" {
-  configuration_source = "terraform-provider-alicloud/examples/vpc"
-}
-
 resource "alicloud_vpc" "main" {
   # VPC名称
   vpc_name = "terraform_vpc"

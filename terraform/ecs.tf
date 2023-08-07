@@ -13,5 +13,6 @@ resource "alicloud_instance" "terraform_ecs" {
   internet_charge_type       = "PayByTraffic"
   internet_max_bandwidth_out = 10
   key_name                   = "txyu7_LiuYuboPC"
+  depends_on                 = [alicloud_vpc.main, alicloud_security_group.default]
   dry_run                    = true
 }
