@@ -71,9 +71,10 @@ services:
     restart: unless-stopped
     container_name: portainer
     volumes:
-      - 'portainer:/data:'
+      - 'portainer:/data'
       - '/var/run/docker.sock:/var/run/docker.sock'
     user: 65534:999
+
 networks:
   macvlan:
     name: iMacvlan
