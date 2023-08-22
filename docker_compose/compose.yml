@@ -1,6 +1,6 @@
 services:
   gost:
-    image: ginuerzh/gost
+    image: ginuerzh/gost:latest
     container_name: gost
     restart: unless-stopped
     networks:
@@ -9,7 +9,7 @@ services:
     command:
       -L=:1080?udp=true -F=192.168.1.254:7890
   qbittorrent:
-    image: linuxserver/qbittorrent
+    image: linuxserver/qbittorrent:latest
     container_name: qbittorrent
     restart: unless-stopped
     environment:
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
     container_name: baidunetdisk
   gerbera:
-    image: gerbera/gerbera
+    image: gerbera/gerbera:latest
     restart: unless-stopped
     container_name: gerbera
     network_mode: host
@@ -74,6 +74,46 @@ services:
       - 'portainer:/data'
       - '/var/run/docker.sock:/var/run/docker.sock'
     user: 65534:999
+  alist:
+    restart: unless-stopped
+    volumes:
+      - alist_etc:/opt/alist/data
+    ports:
+      - 5244:5244
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - UMASK=022
+    container_name: alist
+    image: xhofe/alist:latest
+  aria2-pro:
+    container_name: aria2-pro
+    image: p3terx/aria2-pro:latest
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - UMASK_SET=022
+      - RPC_SECRET=ARIA2_RPC
+      - RPC_PORT=6800
+      - LISTEN_PORT=6888
+      - TZ=Asia/Shanghai
+    volumes:
+      - aria2-config:/config
+      - aria2-downloads:/downloads
+    ports:
+      - 6800:6800
+      - 6888:6888
+      - 6888:6888/udp
+    restart: unless-stopped
+  ariaNg:
+    container_name: ariang
+    image: p3terx/ariang:latest
+    ports:
+      - 6880:6880
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: 1m
 
 networks:
   macvlan:
@@ -129,3 +169,21 @@ volumes:
       type: none
       o: bind
       device: /mnt/NFS_Share/DockerPV/portainer
+  alist_etc:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/DockerPV/alist
+  aria2-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/DockerPV/aria2-config
+  aria2-downloads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/NFS_Share/iDownload/aria2-downloads
