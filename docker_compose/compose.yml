@@ -18,25 +18,21 @@ services:
       - TZ=Asia/Shanghai
       - WEBUI_PORT=443
     volumes:
-      - 'iDownload_Qbittorrent:/downloads'
-      - 'qbittorrent:/config'
+      - iDownload_Qbittorrent:/downloads
+      - qbittorrent:/config
     networks:
       macvlan:
         ipv4_address: 192.168.1.89
-#    depends_on:
-#      - gost
-#    links:
-#      - gost
   baidunetdisk:
     environment:
       - USER_ID=65534
       - GROUP_ID=65534
     ports:
-      - '5800:5800'
-      - '5801:5900'
+      - 5800:5800
+      - 5801:5900
     volumes:
-      - 'iDownload_BaiduNetdisk:/download'
-      - 'baidunetdisk:/config'
+      - iDownload_BaiduNetdisk:/download
+      - baidunetdisk:/config
     image: johngong/baidunetdisk:latest
     restart: unless-stopped
     container_name: baidunetdisk
@@ -47,12 +43,12 @@ services:
     network_mode: host
     user: 65534:65534
     volumes:
-      - 'iMedia:/content:ro'
-      - 'gerbera:/var/run/gerbera'
+      - iMedia:/content:ro
+      - gerbera:/var/run/gerbera
   subconverter:
     ports:
-      - '25500:25500'
-      - '25501:80'
+      - 25500:25500
+      - 25501:80
     image: tindy2013/subconverter:latest
     restart: unless-stopped
     container_name: subconverter
@@ -65,14 +61,14 @@ services:
       - subconverter
   portainer:
     ports:
-      - '8000:8000'
-      - '9443:9443'
+      - 8000:8000
+      - 9443:9443
     image: portainer/portainer-ce:latest
     restart: unless-stopped
     container_name: portainer
     volumes:
-      - 'portainer:/data'
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
     user: 65534:999
   alist:
     restart: unless-stopped
@@ -114,6 +110,29 @@ services:
     logging:
       options:
         max-size: 1m
+  webdav-client:
+    volumes:
+      - /mnt/webdav:/mnt/webdrive:rshared
+    restart: unless-stopped
+    devices:
+      - /dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      - WEBDRIVE_USERNAME=admin
+      - WEBDRIVE_PASSWORD=webdav
+      - WEBDRIVE_URL=http://alist:5244/dav
+      - DAVFS2_ASK_AUTH=0
+      - TZ=Asia/Shanghai
+      - OWNER=1000
+    image: efrecon/webdav-client:latest
+    container_name: webdav
+    depends_on:
+      - alist
+    links:
+      - alist
 
 networks:
   macvlan:
@@ -126,6 +145,7 @@ networks:
       config:
         - subnet: 192.168.1.0/24
           gateway: 192.168.1.254
+
 volumes:
   qbittorrent:
     driver: local
