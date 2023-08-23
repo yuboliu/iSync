@@ -29,7 +29,7 @@ services:
       - GROUP_ID=65534
     ports:
       - 5800:5800
-      - 5801:5900
+      #- 5900:5900
     volumes:
       - iDownload_BaiduNetdisk:/download
       - baidunetdisk:/config
@@ -61,7 +61,7 @@ services:
       - subconverter
   portainer:
     ports:
-      - 8000:8000
+      #- 8000:8000
       - 9443:9443
     image: portainer/portainer-ce:latest
     restart: unless-stopped
@@ -82,8 +82,8 @@ services:
       - UMASK=022
     container_name: alist
     image: xhofe/alist:latest
-  aria2-pro:
-    container_name: aria2-pro
+  aria2:
+    container_name: aria2
     image: p3terx/aria2-pro:latest
     environment:
       - PUID=65534
@@ -102,7 +102,7 @@ services:
       - 6888:6888/udp
     restart: unless-stopped
   ariaNg:
-    container_name: ariang
+    container_name: ariaNg
     image: p3terx/ariang:latest
     ports:
       - 6880:6880
@@ -110,7 +110,7 @@ services:
     logging:
       options:
         max-size: 1m
-  webdav-client:
+  webdav:
     volumes:
       - /mnt/webdav:/mnt/webdrive:rshared
     restart: unless-stopped
