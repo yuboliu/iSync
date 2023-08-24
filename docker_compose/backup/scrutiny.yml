@@ -1,0 +1,20 @@
+services:
+  scrutiny:
+    container_name: scrutiny
+    restart: unless-stopped
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    environment:
+      - TZ=Asia/Shanghai
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+    ports:
+      - "8080:8080" # webapp
+      - "8086:8086" # influxDB admin
+    volumes:
+      - /run/udev:/run/udev:ro
+      - /opt/DockerPV/scrutiny/config:/opt/scrutiny/config
+      - /opt/DockerPV/scrutiny/influxdb:/opt/scrutiny/influxdb
+    devices:
+      - "/dev/sda"
+      - "/dev/nvme0"
