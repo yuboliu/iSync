@@ -1,13 +1,22 @@
 services:
+  gost_direct:
+    image: ginuerzh/gost:latest
+    container_name: gost_direct
+    restart: unless-stopped
+    networks:
+      macvlan:
+        ipv4_address: 172.16.16.90
+    command:
+      -L=:1080?udp=true -F=172.16.16.254:7890
   gost:
     image: ginuerzh/gost:latest
     container_name: gost
     restart: unless-stopped
     networks:
       macvlan:
-        ipv4_address: 192.168.1.90
+        ipv4_address: 172.16.16.190
     command:
-      -L=:1080?udp=true -F=192.168.1.254:7890
+      -L=:1080?udp=true -F=172.16.16.254:7890
   qbittorrent:
     image: linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -22,7 +31,7 @@ services:
       - qbittorrent:/config
     networks:
       macvlan:
-        ipv4_address: 192.168.1.89
+        ipv4_address: 172.16.16.89
   baidunetdisk:
     environment:
       - USER_ID=65534
@@ -110,29 +119,29 @@ services:
     logging:
       options:
         max-size: 1m
-  webdav:
-    volumes:
-      - /mnt/webdav:/mnt/webdrive:rshared
-    restart: unless-stopped
-    devices:
-      - /dev/fuse
-    cap_add:
-      - SYS_ADMIN
-    security_opt:
-      - apparmor=unconfined
-    environment:
-      - WEBDRIVE_USERNAME=admin
-      - WEBDRIVE_PASSWORD=webdav
-      - WEBDRIVE_URL=http://alist:5244/dav
-      - DAVFS2_ASK_AUTH=0
-      - TZ=Asia/Shanghai
-      - OWNER=1000
-    image: efrecon/webdav-client:latest
-    container_name: webdav
-    depends_on:
-      - alist
-    links:
-      - alist
+#  webdav:
+#    volumes:
+#      - /mnt/webdav:/mnt/webdrive:rshared
+#    restart: unless-stopped
+#    devices:
+#      - /dev/fuse
+#    cap_add:
+#      - SYS_ADMIN
+#    security_opt:
+#      - apparmor=unconfined
+#    environment:
+#      - WEBDRIVE_USERNAME=wewbdav
+#      - WEBDRIVE_PASSWORD=webdav
+#      - WEBDRIVE_URL=http://alist:5244/dav
+#      - DAVFS2_ASK_AUTH=0
+#      - TZ=Asia/Shanghai
+#      - OWNER=1000
+#    image: efrecon/webdav-client:latest
+#    container_name: webdav
+#    depends_on:
+#      - alist
+#    links:
+#      - alist
 
 networks:
   macvlan:
@@ -143,8 +152,8 @@ networks:
       macvlan_mode: bridge
     ipam:
       config:
-        - subnet: 192.168.1.0/24
-          gateway: 192.168.1.254
+        - subnet: 172.16.16.0/24
+          gateway: 172.16.16.254
 
 volumes:
   qbittorrent:
